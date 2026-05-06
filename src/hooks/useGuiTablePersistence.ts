@@ -15,6 +15,25 @@ interface GuiTablePersistenceStatus {
   lastSavedAt: number | null;
 }
 
+interface PersistedGuiLayoutSnapshot extends GuiTableSnapshot {
+  schema: "gui-layout.v1";
+  savedAt: number;
+}
+
+function isPersistedGuiLayoutSnapshot(value: unknown): value is PersistedGuiLayoutSnapshot {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  const snapshot = value as Partial<PersistedGuiLayoutSnapshot>;
+  return (
+    snapshot.schema === "gui-layout.v1" &&
+    Array.isArray(snapshot.buttonRows) &&
+    Array.isArray(snapshot.textRows) &&
+    typeof snapshot.savedAt === "number"
+  );
+}
+
 export function useGuiTablePersistence({
   buttonRows,
   bindingRows,
@@ -41,14 +60,22 @@ export function useGuiTablePersistence({
 
   const saveSnapshot = useCallback(async (): Promise<void> => {
     const snapshot = latestRowsRef.current;
+    const savedAt = Date.now();
+    const layoutSnapshot: PersistedGuiLayoutSnapshot = {
+      schema: "gui-layout.v1",
+      buttonRows: snapshot.buttonRows,
+      textRows: snapshot.textRows,
+      savedAt,
+    };
 
     await Promise.all([
+      store.saveRecord("gui_layout_snapshot", layoutSnapshot),
       store.saveTable("button_layers", snapshot.buttonRows),
       store.saveTable("captivate_button_bindings", snapshot.bindingRows),
       store.saveTable("text_layers", snapshot.textRows),
     ]);
 
-    setLastSavedAt(Date.now());
+    setLastSavedAt(savedAt);
     setReady(true);
     setError(null);
   }, [store]);
@@ -59,16 +86,29 @@ export function useGuiTablePersistence({
     void (async () => {
       try {
         await store.connect();
-        const [loadedButtons, loadedTexts] = await Promise.all([
+        const [savedLayoutSnapshot, loadedButtons, loadedTexts] = await Promise.all([
+          store.loadRecord<PersistedGuiLayoutSnapshot>("gui_layout_snapshot"),
           store.loadTable<GuiButtonTableRow>("button_layers"),
           store.loadTable<GuiTextTableRow>("text_layers"),
         ]);
+        const initialSnapshot = isPersistedGuiLayoutSnapshot(savedLayoutSnapshot)
+          ? {
+              buttonRows: savedLayoutSnapshot.buttonRows,
+              textRows: savedLayoutSnapshot.textRows,
+            }
+          : {
+              buttonRows: loadedButtons,
+              textRows: loadedTexts,
+            };
 
         if (!isDisposed) {
-          onLoaded({ buttonRows: loadedButtons, textRows: loadedTexts });
+          onLoaded(initialSnapshot);
           hasLoadedRef.current = true;
           setReady(true);
           setError(null);
+          if (isPersistedGuiLayoutSnapshot(savedLayoutSnapshot)) {
+            setLastSavedAt(savedLayoutSnapshot.savedAt);
+          }
 
           if (pendingSaveRef.current) {
             pendingSaveRef.current = false;

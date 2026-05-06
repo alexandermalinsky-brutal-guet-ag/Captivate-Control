@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh auth *)",
+      "Read(//Users/alexandermalinsky/Desktop/Brutal_Güet_AG/R_and_D/Development/Captivate-Control-Release/src-tauri/**)",
+      "Read(//Users/alexandermalinsky/Desktop/Brutal_Güet_AG/R_and_D/Development/Captivate-Control-Release/**)"
+    ]
+  }
+}

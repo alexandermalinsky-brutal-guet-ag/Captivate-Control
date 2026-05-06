@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<inputBehavior
+  name="Captivate Control: Data API Browser"
+  defaultQueuingMode="auto"
+  url="controller/controller.html"
+  hidden="false"
+  UIGroups="General">
+{{variables}}
+</inputBehavior>

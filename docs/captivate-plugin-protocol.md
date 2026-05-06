@@ -5,7 +5,7 @@ Captivate-Control exposes a local TCP bridge on `127.0.0.1:45454` by default.
 ## Startup
 
 1. Start the Captivate-Control desktop app.
-2. Open the `GUI` page (bridge starts automatically).
+2. Open the `Playout UI` page (bridge starts automatically).
 3. Start your Captivate plugin and connect to `127.0.0.1:45454`.
 
 ## Frame Format
@@ -91,7 +91,7 @@ Use `tools/captivate-plugin-starter.js` as a temporary plugin connector:
 node tools/captivate-plugin-starter.js
 ```
 
-Then click a GUI button (outside edit mode) to confirm trigger delivery.
+Then click a Playout UI button (outside edit mode) to confirm trigger delivery.
 
 ## Captivate Integration Scaffold
 
@@ -146,7 +146,7 @@ After install, restart NewBlue Captivate.
 - Ensure your graphic layers exist in the project.
 - Captivate-Control reads layer names from `getTitlesPlayStatus`.
 
-4. In Captivate-Control GUI button popup
+4. In Captivate-Control Playout UI button popup
 - `Captivate Layer` dropdown now uses real layer names coming from Captivate.
 - `Captivate Target` mapping rules:
   - `input:YourInputName` -> targets Titler input/controller

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Captivate Control Data API Browser</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <script type="text/javascript" src="/common/js/qwebchannel.js"></script>
+    <script type="text/javascript" src="/common/js/servicehandler.js"></script>
+  </head>
+  <body>
+    <main class="workspace-layout data-page-blank">
+      <header class="data-page-header">
+        <h1>Captivate Control</h1>
+        <div class="data-page-separator" aria-hidden="true"></div>
+      </header>
+
+      <section class="page-panel">
+        <div class="page-panel-header">
+          <strong>API Connection</strong>
+        </div>
+        <div class="page-panel-body">
+          <div class="field-row">
+            <label for="apiBaseUrl">API URL</label>
+            <div class="field-row-input">
+              <input id="apiBaseUrl" type="text" value="http://127.0.0.1:45455" />
+              <button id="refreshTablesButton" type="button" class="ctrl-button">Refresh</button>
+            </div>
+          </div>
+          <p id="statusMessage" class="status-message">Initializing Captivate controller...</p>
+        </div>
+      </section>
+
+      <section class="page-panel">
+        <div class="page-panel-header">
+          <strong>Table Selection</strong>
+        </div>
+        <div class="page-panel-body">
+          <div class="field-row">
+            <label for="tableSelect">Table</label>
+            <select id="tableSelect"></select>
+          </div>
+          <div class="field-row-buttons">
+            <button id="playButton" type="button" class="ctrl-button">Play</button>
+            <button id="updateButton" type="button" class="ctrl-button">Update</button>
+            <button id="playOutButton" type="button" class="ctrl-button">Play Out</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="page-panel">
+        <div class="page-panel-header">
+          <strong>Rows</strong>
+        </div>
+        <div class="page-panel-body">
+          <p id="rowInfo" class="status-message">Refresh the API and select a table.</p>
+          <div id="tableContainer" class="data-table-scroll"></div>
+        </div>
+      </section>
+
+      <section class="page-panel">
+        <div class="page-panel-header">
+          <strong>Variable Linking</strong>
+        </div>
+        <div class="page-panel-body">
+          <p class="status-message">
+            Link each selected-table variable to a title field using Captivate's assignment popup.
+          </p>
+          <div class="data-table-scroll">
+            <table id="variableAssignmentTable" class="variable-assignment-table">
+              <thead>
+                <tr>
+                  <th>Input Variable</th>
+                  <th>Title Field</th>
+                  <th>Current Value</th>
+                </tr>
+              </thead>
+              <tbody id="variableAssignmentBody">
+                <tr>
+                  <td colspan="3">Select a table to populate linkable variables.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <pre id="variablePreview" class="preview-block">{}</pre>
+        </div>
+      </section>
+    </main>
+
+    <script type="text/javascript" src="js/app.js"></script>
+  </body>
+</html>

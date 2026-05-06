@@ -1,3 +1,12 @@
+mod data_api;
+mod captivate_integration;
+
+use crate::captivate_integration::{
+    CaptivateIntegrationAdminCommand, CaptivateIntegrationInstallResult, CaptivateIntegrationStatus,
+};
+use crate::data_api::{
+    DataApiRuntime, DataApiStatus, PublishedTable, TableSelectInstance, DEFAULT_DATA_API_PORT,
+};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::io::{BufRead, BufReader, Write};
@@ -13,6 +22,7 @@ const DEFAULT_CAPTIVATE_BRIDGE_PORT: u16 = 45454;
 #[derive(Default)]
 struct AppState {
     bridge: Mutex<CaptivateBridgeRuntime>,
+    data_api: Mutex<DataApiRuntime>,
 }
 
 #[derive(Default)]
@@ -403,6 +413,97 @@ fn captivate_send_button_trigger(
     broadcast_to_clients(&runtime, &framed)
 }
 
+#[tauri::command]
+fn data_api_start(state: tauri::State<AppState>, port: Option<u16>) -> Result<DataApiStatus, String> {
+    let mut runtime = state
+        .data_api
+        .lock()
+        .map_err(|_| "Data API runtime lock poisoned".to_string())?;
+
+    let selected_port = port.unwrap_or(DEFAULT_DATA_API_PORT);
+    data_api::start(&mut runtime, selected_port)?;
+    Ok(data_api::status(&runtime))
+}
+
+#[tauri::command]
+fn data_api_stop(state: tauri::State<AppState>) -> Result<(), String> {
+    let mut runtime = state
+        .data_api
+        .lock()
+        .map_err(|_| "Data API runtime lock poisoned".to_string())?;
+
+    data_api::stop(&mut runtime);
+    Ok(())
+}
+
+#[tauri::command]
+fn data_api_status(state: tauri::State<AppState>) -> Result<DataApiStatus, String> {
+    let runtime = state
+        .data_api
+        .lock()
+        .map_err(|_| "Data API runtime lock poisoned".to_string())?;
+
+    Ok(data_api::status(&runtime))
+}
+
+#[tauri::command]
+fn data_api_publish_tables(
+    state: tauri::State<AppState>,
+    tables: Vec<PublishedTable>,
+) -> Result<(), String> {
+    let runtime = state
+        .data_api
+        .lock()
+        .map_err(|_| "Data API runtime lock poisoned".to_string())?;
+
+    data_api::publish_tables(&runtime, tables)
+}
+
+#[tauri::command]
+fn data_api_publish_table_selects(
+    state: tauri::State<AppState>,
+    instances: Vec<TableSelectInstance>,
+) -> Result<(), String> {
+    let runtime = state
+        .data_api
+        .lock()
+        .map_err(|_| "Data API runtime lock poisoned".to_string())?;
+
+    data_api::publish_table_selects(&runtime, instances)
+}
+
+#[tauri::command]
+fn captivate_integration_status() -> Result<CaptivateIntegrationStatus, String> {
+    Ok(captivate_integration::status())
+}
+
+#[tauri::command]
+fn captivate_integration_install(
+    state: tauri::State<AppState>,
+) -> Result<CaptivateIntegrationInstallResult, String> {
+    let (tables, table_selects) = {
+        let runtime = state
+            .data_api
+            .lock()
+            .map_err(|_| "data API lock poisoned".to_string())?;
+        (
+            data_api::snapshot_tables(&runtime),
+            data_api::snapshot_table_selects(&runtime),
+        )
+    };
+    captivate_integration::install(tables, table_selects)
+}
+
+#[tauri::command]
+fn captivate_integration_restart() -> Result<(), String> {
+    captivate_integration::restart_captivate()
+}
+
+#[tauri::command]
+fn captivate_integration_admin_command(app: tauri::AppHandle) -> Result<CaptivateIntegrationAdminCommand, String> {
+    captivate_integration::admin_install_command(&app)
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -418,7 +519,16 @@ pub fn run() {
             captivate_get_layer_names,
             captivate_request_layer_sync,
             captivate_send_data_push,
-            captivate_send_command
+            captivate_send_command,
+            data_api_start,
+            data_api_stop,
+            data_api_status,
+            data_api_publish_tables,
+            data_api_publish_table_selects,
+            captivate_integration_status,
+            captivate_integration_install,
+            captivate_integration_restart,
+            captivate_integration_admin_command
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

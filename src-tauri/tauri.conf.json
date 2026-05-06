@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "captivate-control",
+  "productName": "Captivate Control",
   "version": "0.1.0",
   "identifier": "com.alexandermalinsky.captivate-control",
   "build": {
@@ -13,7 +13,7 @@
     "withGlobalTauri": true,
     "windows": [
       {
-        "title": "captivate-control",
+        "title": "Captivate Control",
         "width": 800,
         "height": 600
       }

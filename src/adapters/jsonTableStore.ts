@@ -41,6 +41,20 @@ export class JsonTableStore {
     return Array.isArray(parsed) ? parsed : [];
   }
 
+  async loadRecord<TRecord>(recordName: string): Promise<TRecord | null> {
+    const path = this.getTablePath(recordName);
+    const recordExists = await exists(path, { baseDir: BaseDirectory.AppData });
+
+    if (!recordExists) {
+      return null;
+    }
+
+    const content = await readTextFile(path, { baseDir: BaseDirectory.AppData });
+    const parsed = JSON.parse(content) as TRecord | null;
+
+    return parsed && typeof parsed === "object" ? parsed : null;
+  }
+
   async saveTable<TRecord>(tableName: string, records: TRecord[]): Promise<void> {
     if (!this.isConnected) {
       return;
@@ -48,6 +62,16 @@ export class JsonTableStore {
 
     const payload = JSON.stringify(records, null, 2);
     this.writeQueue = this.writeQueue.then(() => this.atomicWrite(tableName, payload));
+    await this.writeQueue;
+  }
+
+  async saveRecord<TRecord>(recordName: string, record: TRecord): Promise<void> {
+    if (!this.isConnected) {
+      return;
+    }
+
+    const payload = JSON.stringify(record, null, 2);
+    this.writeQueue = this.writeQueue.then(() => this.atomicWrite(recordName, payload));
     await this.writeQueue;
   }
 

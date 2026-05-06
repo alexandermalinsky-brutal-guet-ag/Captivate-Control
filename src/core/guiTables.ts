@@ -1,6 +1,7 @@
 export type TextAlignment = "left" | "center" | "right";
 export type GuiButtonTextWeight = "regular" | "bold";
 export type GuiButtonAction =
+  | "custom"
   | "animate-in-out"
   | "animate-in"
   | "animate-out"
@@ -45,6 +46,12 @@ export interface GuiTextTableRow {
 export interface GuiTableSnapshot {
   buttonRows: GuiButtonTableRow[];
   textRows: GuiTextTableRow[];
+}
+
+export interface GuiLayoutSnapshot extends GuiTableSnapshot {
+  schema: "gui-snapshot.v1";
+  name: string;
+  savedAt: number;
 }
 
 export interface GuiCaptivateButtonBindingRow {
