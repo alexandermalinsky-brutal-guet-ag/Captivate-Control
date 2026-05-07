@@ -106,7 +106,14 @@ Pushing a tag matching `v*` (e.g. `v0.1.0`) triggers `.github/workflows/release.
 
 ## License
 
-Currently unlicensed (all rights reserved). Add a license before distributing more widely.
+This project is licensed under [Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)](https://creativecommons.org/licenses/by-sa/4.0/).
+
+You're free to share and adapt the material for any purpose, including commercially, as long as you:
+
+- **Give appropriate credit** — link back to this repository and indicate any changes.
+- **Share alike** — if you remix, transform, or build upon the material, distribute your contributions under the same license.
+
+See the [LICENSE](LICENSE) file for the full legal text.
 
 ## Credits
 
