@@ -117,4 +117,4 @@ See the [LICENSE](LICENSE) file for the full legal text.
 
 ## Credits
 
-Alexander Malinsky — alexandermalinsky@icloud.com — Brutal Güet AG
+Alexander Malinsky — alexandermalinsky@icloud.com
